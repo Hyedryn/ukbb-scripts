@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=8000M
 #SBATCH --mail-type=BEGIN
