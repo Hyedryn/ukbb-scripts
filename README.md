@@ -1,4 +1,4 @@
-#1. download ukbb zip files using ukbbfetch utility in `$SCRATCH/ukbb_zip_files`
+#1. download ukbb zip files using ukbbfetch utility in `${SCRATCH}/ukbb_zip_files`
 
 #2. install datalad_ukbb inside a python 3.8 venv (use ukbfetch_surrogate.sh)
 
