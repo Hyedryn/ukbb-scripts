@@ -12,6 +12,6 @@ for line in $(cat .ukbbatch |  sed 's/ /,/g'); do
     modality=${line#*,}
 
     # transfer data from remote server
-    rsync -avh --info=progress2 "/scratch/ltetrel/ukbb_zip_files/${sub_id}_${modality}"* ./
+    rsync -avh --info=progress2 "/scratch/${USER}/ukbb_zip_files/${sub_id}_${modality}"* ./
 
 done
