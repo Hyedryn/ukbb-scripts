@@ -18,7 +18,7 @@ module load singularity/3.8
 
 # prepare input directory
 #copying root dataset into local scratch space
-rsync -rltv --info=progress2 --exclude "sub-*" ${DATASET_DIR} ${SLURM_TMPDIR}
+rsync -rltv --info=progress2 --exclude "sub-*" --exclude "*.workdir" ${DATASET_DIR} ${SLURM_TMPDIR}
 DATASET_TMPDIR=${SLURM_TMPDIR}/ukbb
 #bids-compatible subject data with ukb_datalad
 source ~/.virtualenvs/datalad_ukbb/bin/activate
@@ -26,7 +26,7 @@ datalad create ${DATASET_TMPDIR}/sub-${PARTICIPANT_ID}
 cd ${DATASET_TMPDIR}/sub-${PARTICIPANT_ID}
 datalad ukb-init --bids --force ${PARTICIPANT_ID} 20227_2_0 20252_2_0
 datalad ukb-update --merge --force --keyfile "./" --drop archives
-rm -r sub-${PARTICIPANT_ID}/*/non-bids
+rm -r */non-bids
 cd ${SLURM_TMPDIR}
 deactivate
 
