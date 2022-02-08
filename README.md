@@ -7,7 +7,7 @@
 git clone https://github.com/ccna-biomarkers/ukbb_scripts.git
 ```
 
-#4. copy `ukbb` dir at `$SCRATCH/datasets/ukbb` on compute canada
+#4. copy `ukbb` dir at `${SCRATCH}/datasets/ukbb` on compute canada
 
 #5. you can now submit a preprocessing job for one participant with:
 
