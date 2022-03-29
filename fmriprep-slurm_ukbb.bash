@@ -57,14 +57,14 @@ fmriprep_exitcode=$?
 
 # tar preprocessed outputs
 cd ${DATASET_TMPDIR}
-tar -czvf $tar_preprocessed .
+tar -czf ${SLURM_TMPDIR}/$tar_preprocessed .
 cd ${SLURM_TMPDIR}/fmriprep_work
-tar -czvf $tar_workdir .
+tar -czf ${SLURM_TMPDIR}/$tar_workdir .
 
 ### ts extraction
 rsync -rlt $SCRATCH/atlases $SLURM_TMPDIR/
 source ~/.virtualenvs/ts_extraction/bin/activate
-python3 ~/ccna_ts_extraction/extract_timeseries_tar.py -i $SLURM_TMPDIR/ukbb/derivatives/fmriprep/fmriprep/ --atlas-path $SLURM_TMPDIR/atlases --dataset-name ukbb -o $SLURM_TMPDIR
+python3 ~/ccna_ts_extraction/extract_timeseries_tar.py -i $SLURM_TMPDIR/ukbb/derivatives/fmriprep/fmriprep/ --atlas-path $SLURM_TMPDIR/atlases --dataset-name ukbb_sub-${PARTICIPANT_ID} -o $SLURM_TMPDIR
 deactivate
 
 ### tranfer archives
