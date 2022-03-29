@@ -62,5 +62,6 @@ scp -r ${SCRATCH}/atlases/segmented_difumo_atlases/* ${SCRATCH}/atlases && rm -r
 Submit a preprocessing job for one participant `PARTICIPANT_ID` with:
 
 ```
-$HOME/ukbb_scripts/ukbb_preprocess.bash PARTICIPANT_ID
+PARTICIPANT_ID=xxx
+sbatch --account=def-xxx --job-name=fmriprep_ukbb_${PARTICIPANT_ID}_%j.job --mail-user="xxx@xxx.com" --output=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.out --error=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.err ${HOME}/ukbb_scripts/fmriprep-slurm_ukbb.bash ${PARTICIPANT_ID}
 ```
