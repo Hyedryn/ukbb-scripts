@@ -1,4 +1,7 @@
-## First time setup
+# ukbb_scripts
+This repository holds all scripts to preprocess ukbb using `ctb-pbellec` tape server and `rrg-jacquese` (or `def-jacquese`) allocation.
+
+### First time setup
 
 #### Environment
 
@@ -60,7 +63,7 @@ tar -zxvf $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz -C ${SCRAT
 scp -r ${SCRATCH}/atlases/segmented_difumo_atlases/* ${SCRATCH}/atlases && rm -r ${SCRATCH}/atlases/segmented_difumo_atlases && rm $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz
 ```
 
-## Usage
+### Usage
 
 #### Launching preprocessing job
 
