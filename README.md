@@ -1,4 +1,6 @@
-### Environment
+## First time setup
+
+#### Environment
 
 1. Clone this repo in your HPC HOME
 ```
@@ -37,7 +39,7 @@ python3 -m pip install ccna_ts_extraction/requirements.txt
 deactivate
 ```
 
-###  Data
+####  Data
 
 Download ukbb zip files using ukbbfetch utility and place the `zip` archives in `$SCRATCH/ukbb_zip_files`
 
@@ -57,11 +59,25 @@ tar -zxvf $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz -C ${SCRAT
 scp -r ${SCRATCH}/atlases/segmented_difumo_atlases/* ${SCRATCH}/atlases && rm -r ${SCRATCH}/atlases/segmented_difumo_atlases && rm $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz
 ```
 
-### Usage
+## Usage
+
+#### Launching preprocessing job
 
 Submit a preprocessing job for one participant `PARTICIPANT_ID` with:
 
 ```
 PARTICIPANT_ID=xxx
 sbatch --account=def-xxx --job-name=fmriprep_ukbb_${PARTICIPANT_ID}_%j.job --mail-user="xxx@xxx.com" --output=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.out --error=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.err ${HOME}/ukbb_scripts/fmriprep-slurm_ukbb.bash ${PARTICIPANT_ID}
+```
+
+#### Sharing
+
+After preprocessing, all the data will be availble at `$SCRATCH/datasets/ukbb`.
+The preprocessing outputs is archived at `/nearline/ctb-pbellec/preprocessed_data/ukbb*` and raw data is at `/nearline/ctb-pbellec/datasets/ukbb`.
+
+To download the data, you will manually copy into the desired system. For example if you need to QC the data you can:
+```
+scp -r /nearline/ctb-pbellec/preprocessed_data/ukbb.qc /PATH/TO/MY/DIR
+cd /PATH/TO/MY/DIR/ukbb.qc
+find . -name "*.tar.gz" -exec bash -c 'tar -xzvf "$0" -C "${0%/*}"; rm "$0"' {} \;
 ```
