@@ -28,16 +28,15 @@ ln -s $HOME/ukbb_scripts/ukbfetch_surrogate.sh $HOME/.virtualenvs/datalad-ukbb/b
 4. Install the ukbb dataset layout
 ```
 mkdir -p $SCRATCH/datasets
-git clone git@github.com:ccna-biomarkers/ukbb-preprocess-template.git $SCRATCH/datasets/ukbb
+git clone https://github.com/ccna-biomarkers/ukbb-preprocess-template.git $SCRATCH/datasets/ukbb
 ```
 
 5. Install the timeserie extraction tool
 ```
-git clone git@github.com:ccna-biomarkers/ccna_ts_extraction.git
 module load python/3.8
 python3 -m venv ~/.virtualenvs/ts_extraction
 source ~/.virtualenvs/ts-extraction/bin/activate
-git clone git@github.com:ccna-biomarkers/ccna_ts_extraction.git
+git clone https://github.com/ccna-biomarkers/ccna_ts_extraction.git
 python3 -m pip install ccna_ts_extraction/requirements.txt
 deactivate
 ```
