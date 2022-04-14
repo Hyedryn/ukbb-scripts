@@ -52,7 +52,7 @@ deactivate
 
 >**Note**
 >
->If you have access to the `rrg-jacquese` allocation on beluga, the data was already downloaded with `ukbbfetch`. The anatomical data is at `beluga.computecanada.ca:~/ projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_T1w` and the functionnal data at `beluga.computecanada.ca:~/projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_rfMRI`.
+>If you have access to the `rrg-jacquese` allocation on beluga, the data was already downloaded on **beluga** with `ukbbfetch`. The anatomical data is at `~/ projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_T1w` and the functionnal data at `~/projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_rfMRI`.
 
 2. Create a directory `$SCRATCH/ukbb_zip_files` and move all the `zip` archives in it.
 
