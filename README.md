@@ -61,7 +61,7 @@ deactivate
 python3 -c "from templateflow.api import get; get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym', 'OASIS30ANTs', 'MNIPediatricAsym', 'MNIInfant'])"
 ```
 
-Get the segmented difumo atlas in your $SCRATCH avalaible on beluga.
+4. Get the segmented difumo atlas in your $SCRATCH avalaible on beluga.
 ```
 mkdir -p ${SCRATCH}/atlases
 scp beluga.computecanada.ca:/nearline/ctb-pbellec/atlases/segmented_difumo_atlases_2022-02-03.tar.gz $SCRATCH/atlases/
