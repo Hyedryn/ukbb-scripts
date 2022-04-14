@@ -61,7 +61,8 @@ Download all templates needed by fmriprep:
 python3 -c "from templateflow.api import get; get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym', 'OASIS30ANTs', 'MNIPediatricAsym', 'MNIInfant'])"
 ```
 
-Get the segmented difumo atlas in your $SCRATCH avalaible on beluga:
+Get the segmented difumo atlas in your $SCRATCH avalaible on beluga.
+Make sure that you setup ssh authentification with github by following [this tutorial](https://simexp-documentation.readthedocs.io/en/latest/tutorials/ssh.html).
 ```
 mkdir -p ${SCRATCH}/atlases
 scp beluga.computecanada.ca:/nearline/ctb-pbellec/atlases/segmented_difumo_atlases_2022-02-03.tar.gz $SCRATCH/atlases/
