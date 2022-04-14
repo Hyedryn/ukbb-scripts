@@ -48,13 +48,15 @@ deactivate
 
 ####  Data
 
-Download ukbb zip files using `ukbbfetch` utility and place the `zip` archives in `$SCRATCH/ukbb_zip_files`
+1. Download ukbb zip files using `ukbbfetch` utility
 
 >**Note**
 >
 >If you have access to the `rrg-jacquese` allocation on beluga, the data was already downloaded with `ukbbfetch`. The anatomical data is at `~/ projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_T1w` and the functionnal data at `~/projects/rrg-jacquese/All_user_common_folder/RAW_DATA/UKBIOBANK-DATA/UKBIOBANK_IMAGING/UKB_MRI_download/UKB_rfMRI`.
 
-Download all templates needed by fmriprep:
+2. Move the `zip` archives in `$SCRATCH/ukbb_zip_files`
+
+3. Download all templates needed by fmriprep:
 ```
 python3 -c "from templateflow.api import get; get(['MNI152NLin2009cAsym', 'MNI152NLin6Asym', 'OASIS30ANTs', 'MNIPediatricAsym', 'MNIInfant'])"
 ```
