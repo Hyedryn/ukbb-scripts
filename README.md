@@ -8,12 +8,11 @@ This repository holds all scripts to preprocess ukbb using `ctb-pbellec` tape se
 First you will need to connect to the server (for example beluga) and then go into your home.
 ```
 ssh $USER@beluga.computecanada.ca
-cd ~
 ```
 
 1. Clone this repo in your HPC HOME
 ```
-git clone https://github.com/ccna-biomarkers/ukbb_scripts.git
+git clone https://github.com/ccna-biomarkers/ukbb_scripts.git ~/ukbb_scripts
 ```
 
 2. Create a virtual environment that will be used to initialize ukbb-bids with datalad
@@ -43,7 +42,7 @@ cd ~
 module load python/3.8
 python3 -m venv ~/.virtualenvs/ts_extraction
 source ~/.virtualenvs/ts_extraction/bin/activate
-git clone https://github.com/ccna-biomarkers/ccna_ts_extraction.git
+git clone https://github.com/ccna-biomarkers/ccna_ts_extraction.git ~/ccna_ts_extraction
 python3 -m pip install -r ccna_ts_extraction/requirements.txt
 deactivate
 ```
