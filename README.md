@@ -48,7 +48,7 @@ deactivate
 
 ####  Data
 
-1. Download ukbb zip files using `ukbbfetch` utility
+1. (if needed) Download ukbb zip files using `ukbbfetch` utility
 
 >**Note**
 >
