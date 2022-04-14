@@ -44,7 +44,7 @@ module load python/3.8
 python3 -m venv ~/.virtualenvs/ts_extraction
 source ~/.virtualenvs/ts_extraction/bin/activate
 git clone https://github.com/ccna-biomarkers/ccna_ts_extraction.git
-python3 -m pip install ccna_ts_extraction/requirements.txt
+python3 -m pip install -r ccna_ts_extraction/requirements.txt
 deactivate
 ```
 
