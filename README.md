@@ -69,6 +69,8 @@ tar -zxvf $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz -C ${SCRAT
 scp -r ${SCRATCH}/atlases/segmented_difumo_atlases/* ${SCRATCH}/atlases && rm -r ${SCRATCH}/atlases/segmented_difumo_atlases && rm $SCRATCH/atlases/segmented_difumo_atlases_2022-02-03.tar.gz
 ```
 
+5. Make sure you have the freesurfer license by following [those instructions](https://simexp-documentation.readthedocs.io/en/latest/giga_preprocessing/preprocessing.html#freesrufer-license).
+
 ### Usage
 
 #### Launching preprocessing job
