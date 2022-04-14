@@ -80,7 +80,7 @@ PARTICIPANT_ID=xxx
 sbatch --account=rrg-xxx --job-name=fmriprep_ukbb_${PARTICIPANT_ID}_%j.job --mail-user="xxx@xxx.com" --output=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.out --error=/scratch/%u/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.err ${HOME}/ukbb_scripts/fmriprep-slurm_ukbb.bash ${PARTICIPANT_ID}
 ```
 
-The preprocessing logs will be available at `/scratch/$USER/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.err` and `/scratch/$USER/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_%j.out`.
+Using your `jobid`, the preprocessing logs will be available at `/scratch/$USER/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_${jobid}.err` and `/scratch/$USER/.slurm/fmriprep_ukbb_${PARTICIPANT_ID}_${jobid}.out`.
 
 #### Sharing
 
