@@ -37,8 +37,9 @@ mkdir -p $SCRATCH/datasets
 git clone https://github.com/ccna-biomarkers/ukbb-preprocess-template.git $SCRATCH/datasets/ukbb
 ```
 
-5. Install the timeserie extraction tool
+5. Install the timeserie extraction tool in your home
 ```
+cd ~
 module load python/3.8
 python3 -m venv ~/.virtualenvs/ts_extraction
 source ~/.virtualenvs/ts_extraction/bin/activate
