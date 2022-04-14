@@ -5,6 +5,12 @@ This repository holds all scripts to preprocess ukbb using `ctb-pbellec` tape se
 
 #### Environment
 
+First you will need to connect to the server (for example beluga) and then go into your home.
+```
+ssh $USER@beluga.computecanada.ca
+cd ~
+```
+
 1. Clone this repo in your HPC HOME
 ```
 git clone https://github.com/ccna-biomarkers/ukbb_scripts.git
