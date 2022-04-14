@@ -37,7 +37,7 @@ mkdir -p $SCRATCH/datasets
 git clone https://github.com/ccna-biomarkers/ukbb-preprocess-template.git $SCRATCH/datasets/ukbb
 ```
 
-5. Install the timeserie extraction tool in your home. Make sure that you setup ssh authentification with github by following [this tutorial](https://simexp-documentation.readthedocs.io/en/latest/tutorials/ssh.html).
+5. Install the timeserie extraction tool in your home.
 ```
 cd ~
 module load python/3.8
