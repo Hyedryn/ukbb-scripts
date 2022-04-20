@@ -22,21 +22,28 @@ mkdir ~/.virtualenvs
 python3 -m venv ~/.virtualenvs/datalad-ukbb
 source ~/.virtualenvs/datalad-ukbb/bin/activate
 python3 -m pip install -r $HOME/ukbb_scripts/requirements.txt
+```
+
+3. Make sure that git is correctly configured, and deactivate the environment
+
+```
+git config --global user.name "GITHUB_USER"
+git config --global user.email "GITHUB_MAIL@example.com"
 deactivate
 ```
 
-3. To use ukbfetch with pre-downloaded data, install the surrogate file
+4. To use ukbfetch with pre-downloaded data, install the surrogate file
 ```
 ln -s $HOME/ukbb_scripts/ukbfetch_surrogate.sh $HOME/.virtualenvs/datalad-ukbb/bin/ukbfetch
 ```
 
-4. Install the ukbb dataset layout
+5. Install the ukbb dataset layout
 ```
 mkdir -p $SCRATCH/datasets
 git clone https://github.com/ccna-biomarkers/ukbb-preprocess-template.git $SCRATCH/datasets/ukbb
 ```
 
-5. Install the timeserie extraction tool in your home.
+6. Install the timeserie extraction tool in your home.
 ```
 module load python/3.8
 python3 -m venv ~/.virtualenvs/ts_extraction
