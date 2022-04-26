@@ -3,12 +3,42 @@ This repository holds all scripts to preprocess ukbb using `ctb-pbellec` tape se
 
 ### First time setup
 
-#### Environment
+#### Pre-requirements
+
+Before moving on, you need to make sure of few things.
 
 First you will need to connect to the server (for example beluga) and then go into your home.
 ```
 ssh $USER@beluga.computecanada.ca
 ```
+
+Check that git is correctly configured, and deactivate the environment
+
+```
+git config --global user.name "GITHUB_USER"
+git config --global user.email "GITHUB_MAIL@example.com"
+deactivate
+```
+You should also be able to connect to github passwordless:
+
+```
+ssh -T git@github.com
+```
+
+Finally double check that you have the following line in your `~/.bashrc` file:
+
+```
+source /project/def-pbellec/share/data_admin/etc/bashrc
+```
+If that is not the case, you can add it, and log-out, log-in so it takes effect:
+
+```
+echo "source /project/def-pbellec/share/data_admin/etc/bashrc" >> ~/.bashrc
+exit
+ssh $USER@beluga.computecanada.ca
+```
+
+#### Environment
 
 1. Clone this repo in your HPC HOME
 ```
@@ -22,16 +52,8 @@ mkdir ~/.virtualenvs
 python3 -m venv ~/.virtualenvs/datalad-ukbb
 source ~/.virtualenvs/datalad-ukbb/bin/activate
 python3 -m pip install -r $HOME/ukbb_scripts/requirements.txt
-```
-
-3. Make sure that git is correctly configured, and deactivate the environment
-
-```
-git config --global user.name "GITHUB_USER"
-git config --global user.email "GITHUB_MAIL@example.com"
 deactivate
 ```
-
 4. To use ukbfetch with pre-downloaded data, install the surrogate file
 ```
 ln -s $HOME/ukbb_scripts/ukbfetch_surrogate.sh $HOME/.virtualenvs/datalad-ukbb/bin/ukbfetch
