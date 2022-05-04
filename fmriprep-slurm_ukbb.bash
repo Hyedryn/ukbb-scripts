@@ -85,8 +85,8 @@ mkdir -p /lustre06/nearline/6035398/preprocessed_data/ukbb/fmriprep && scp ${SLU
 mkdir -p /lustre06/nearline/6035398/preprocessed_data/ukbb/freesurfer && scp ${SLURM_TMPDIR}/$tar_freesurfer /lustre06/nearline/6035398/preprocessed_data/ukbb/freesurfer
 mkdir -p /lustre06/nearline/6035398/preprocessed_data/ukbb.qc && scp ${SLURM_TMPDIR}/$tar_qc_fmriprep.gz /lustre06/nearline/6035398/preprocessed_data/ukbb.qc/
 mkdir -p /lustre06/nearline/6035398/preprocessed_data/ukbb.workdir && scp ${SLURM_TMPDIR}/$tar_workdir /lustre06/nearline/6035398/preprocessed_data/ukbb.workdir/
-chmod a+rwx -R mkdir -p /lustre06/nearline/6035398/preprocessed_data/ukbb*
-chmod a+rwx -R mkdir -p /lustre06/nearline/6035398/datasets/ukbb*
+chmod a+rwx -R /lustre06/nearline/6035398/preprocessed_data/ukbb*
+chmod a+rwx -R /lustre06/nearline/6035398/datasets/ukbb*
 
 ### clean compute node
 chmod u+rwx -R ${SLURM_TMPDIR} && rm -rf ${SLURM_TMPDIR}/*
