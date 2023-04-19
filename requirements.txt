@@ -1,2 +1,3 @@
-datalad_ukbiobank==0.3.3
-templateflow==0.7.2
+pandas
+numpy
+python-dotenv
