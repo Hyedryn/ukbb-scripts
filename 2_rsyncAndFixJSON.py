@@ -5,11 +5,13 @@ from multiprocessing.pool import Pool
 import time
 from dotenv import load_dotenv
 
-def rsync_subject(subject_id, bids_path, output_folder, scratch_path):
+def rsync_subject(subject_id, bids_path, output_folder, scratch_path, cluster_username_addr=""):
     """Rsync a subject from the BIDS dataset to the output folder."""
+    if cluster_username_addr == None:
+        cluster_username_addr = ""
     subject_path = bids_path + subject_id + "/"
     output_path = output_folder + subject_id
-    cmd = 'rsync -arl {} {}'.format(subject_path, output_path)
+    cmd = 'rsync -arl {}{} {}'.format(cluster_username_addr, subject_path, output_path)
     std_output = open(os.path.join(scratch_path,"ukbb","scripts","data","rsync.log"), "a")
     subprocess.call(cmd, shell=True)#, stdout=std_output)
     print("Subject {} rsynced".format(subject_id), file=std_output)
@@ -130,6 +132,7 @@ if __name__ == "__main__":
     scratch_path=os.getenv('SCRATCH_PATH')
     bids_path=os.getenv('UKBB_BIDS_FOLDER')
     batch_size=int(os.getenv('BATCH_SIZE'))
+    cluster_username_addr=os.getenv('CLUSTER_USERNAME_ADDR')
     
     rsync_batch=True
     fix_BIDS=True
@@ -178,7 +181,7 @@ if __name__ == "__main__":
         if multicore:
             i = 0
             with Pool(20) as pool:
-                items = [(subject, bids_path, output_path) for subject in batch]
+                items = [(subject, bids_path, output_path, scratch_path, cluster_username_addr) for subject in batch]
                 for subject in pool.starmap(rsync_subject, items):
                     print("rsyncing subject: ", subject, "(",i,"/",batch_size,")", "(",100*(i/batch_size),"%)")
                     i += 1
@@ -186,7 +189,7 @@ if __name__ == "__main__":
             i = 0
             for subject in batch:
                 print("rsyncing subject: ", subject, "(",i,"/",batch_size,")", "(",100*(i/batch_size),"%)")
-                rsync_subject(subject, bids_path, output_path, scratch_path, server_address, server_username)
+                rsync_subject(subject, bids_path, output_path, scratch_path, cluster_username_addr)
                 i += 1
   
     #####################################################

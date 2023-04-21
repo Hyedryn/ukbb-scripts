@@ -1,7 +1,7 @@
 import json
 import os
 import subprocess
-
+from dotenv import load_dotenv
 
 def get_all_job_state():
     """
@@ -51,7 +51,7 @@ def get_job_state(job_id):
     return state
     
 if __name__ == "__main__":
-    scratch_path="/lustre04/scratch/qdessain"
+    scratch_path = os.getenv('SCRATCH_PATH')
     slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","slurm_jobs.json")
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     failed_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_error.json")
