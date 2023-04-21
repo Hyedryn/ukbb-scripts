@@ -8,12 +8,16 @@ import time
 
 if __name__ == "__main__":
     load_dotenv()
-    scratch_path=os.getenv('SCRATCH_PATH')
+    scratch_path = os.getenv('SCRATCH_PATH')
+    slurm_tmp_dir = os.getenv('SLURM_TMPDIR')
+    nearline_path = os.getenv('UKBB_NEARLINE_ARCHIVE_FOLDER')
     
     tarUUID = str(uuid.uuid4())
     tar_file = f"fmriprep_batch_{tarUUID}.tar"
     tmp_archive_dir = os.path.join(scratch_path,"ukbb","tmp_archive",tarUUID)
     os.makedirs(tmp_archive_dir, mode = 0o777, exist_ok = True)
+    if not os.path.exists(tmp_archive_dir):
+        exit(-1)
     
     print(f"Starting archiving with archive id {tarUUID}")
     
@@ -23,7 +27,6 @@ if __name__ == "__main__":
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     archived_subjects_path = os.path.join(scratch_path,"ukbb","scripts","data","archived_subjects.json")
     fmriprep_path = os.path.join(scratch_path,"ukbb","fmriprep")
-    nearline_path = os.path.join("/lustre03","nearline","6035398","giga_preprocessing_2","ukbb_fmriprep-20.2.7lts")
 
     with open(subjects_state_path,"r") as json_file:
         subjects_state = json.load(json_file)
@@ -56,6 +59,7 @@ if __name__ == "__main__":
             
     
     archive_filecount=0
+    newly_archived_subjects = []
     for subject in subjects_state:
         if archive_filecount >= 1000:
             break
@@ -65,9 +69,10 @@ if __name__ == "__main__":
         tar_archive = os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")
         ack_file = os.path.join(scratch_path,"ukbb","COMPLETED",subject)
         if (state == "COMPLETED") and os.path.exists(tar_archive) and os.path.exists(ack_file) and (subject not in archived_subjects):
-            shutil.move(tar_archive, tmp_archive_dir)
+            shutil.copy(tar_archive, tmp_archive_dir)
             archive_filecount+=1
             archived_subjects.append(subject)
+            newly_archived_subjects.append(subject)
             print(f"Number of subjects moved to tmp archive dir: {archive_filecount}/1000.")
         elif (state == "COMPLETED") and os.path.exists(tar_archive) and os.path.exists(ack_file) and subject in archived_subjects:
             print(f"Warning {subject} is already archived!")
@@ -101,6 +106,17 @@ if __name__ == "__main__":
     
     # Clean tmp dir
     shutil.rmtree(tmp_archive_dir) 
+    
+    # Clean fmriprep dir
+    for subject in newly_archived_subjects:
+        last_job = max(subjects_state[subject])
+        state = subjects_state[subject][last_job]
+        tar_archive = os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")
+        ack_file = os.path.join(scratch_path,"ukbb","COMPLETED",subject)
+        if (state == "COMPLETED") and os.path.exists(tar_archive) and os.path.exists(ack_file):
+            shutil.rmtree(tar_archive) 
+        else:
+            print(f"Error, tar_archive for subject {subject} do not exist")
     
     # Update stats
     script_path = os.path.join(scratch_path,"ukbb","scripts")

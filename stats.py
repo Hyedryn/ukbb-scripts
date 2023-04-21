@@ -88,11 +88,15 @@ if __name__ == "__main__":
             analysed_job[slurm_jobs[subject]] = state
         else:
             state = analysed_job[slurm_jobs[subject]]
-            
-        if state == "FAILED" or state == "TIMEOUT":
-            if os.path.exists(os.path.join(scratch_path,"ukbb","fmriprep",f"fmriprep_{subject}.sh")) and os.path.exists(os.path.join(scratch_path,"ukbb","COMPLETED",subject)):
+        
+        state_job = state
+        if state == "FAILED" or state == "TIMEOUT" or state == "NODE_FAIL":
+            if os.path.exists(os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")) and os.path.exists(os.path.join(scratch_path,"ukbb","COMPLETED",subject)):
                 print(f"Subject {subject} flaged as {state} but is COMPLETED!")
                 state = "COMPLETED"
+            elif os.path.exists(os.path.join(scratch_path,"ukbb","FAILED",subject)) and state != "FAILED":
+                print(f"Subject {subject} flaged as {state} but is FAILED!")
+                state = "FAILED"
         
         if subject not in subjects_state:
             subjects_state[subject] = {}
@@ -104,12 +108,15 @@ if __name__ == "__main__":
             #subjects_state[subject]["9999999999"] = "ARCHIVED"
             state = "ARCHIVED"
         
-        if state in status.keys():
+        if state_job in status.keys():
             if new:
-                status[state] += 1
+                status[state_job] += 1
+        else:
+            status[state_job] = 1
+            
+        if state in status_subject.keys():
             status_subject[state] += 1
         else:
-            status[state] = 1
             status_subject[state] = 1
         
     print("Job status: ",status)

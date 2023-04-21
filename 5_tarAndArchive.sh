@@ -10,7 +10,7 @@
 #SBATCH --mail-type=FAIL
 
 cd /lustre04/scratch/qdessain/ukbb/scripts/
-python tar_and_archive.py
+python 5_tarAndArchive.py
 #while python tar_and_archive.py
 #do
 #  echo "Preparing next archive batch"

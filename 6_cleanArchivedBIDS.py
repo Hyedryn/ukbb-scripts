@@ -26,8 +26,12 @@ if __name__ == "__main__":
         last_job = max(subjects_state[subject])
         state = subjects_state[subject][last_job]
         bids_subject_folder = os.path.join(scratch_path,"ukbb","ukbb_bids",subject)
+        workdir_subject_folder = os.path.join(scratch_path,"ukbb","workdir",f"fmriprep_{subject}.workdir")
         if (state == "ARCHIVED") and (subject in archived_subjects) and os.path.exists(bids_subject_folder):
             #print(bids_subject_folder)
             shutil.rmtree(bids_subject_folder)
+        if ((state == "ARCHIVED") or (state == "COMPLETED")) and (subject in archived_subjects) and os.path.exists(workdir_subject_folder):
+            print("Cleaned workdir ",workdir_subject_folder)
+            shutil.rmtree(workdir_subject_folder)
 
     print("Residual subject bids folder cleaned!")
