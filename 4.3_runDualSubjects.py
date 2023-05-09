@@ -5,9 +5,9 @@ from multiprocessing.pool import Pool
 import time
 from dotenv import load_dotenv
 
-def gen_slurm_batch(subject1, subject2, subject3, subject4, subject5, subject6, jobName, scratch_path, email, timeout="38:00:00"):
+def gen_slurm_batch(subject1, subject2, jobName, scratch_path, email, timeout="38:00:00"):
     
-    core = str(6)
+    core = str(2)
     
     slurm_batch = f"""#!/bin/bash
 #SBATCH --account=rrg-pbellec
@@ -75,15 +75,11 @@ function run_subject {{
 
 }}
 
-echo "Launching subjects {subject1}_{subject2}_{subject3}_{subject4}_{subject5}_{subject6}";
+echo "Launching subjects {subject1}_{subject2}";
 module load singularity/3.8
 
 run_subject {subject1} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject1}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject1}.out &
 run_subject {subject2} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject2}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject2}.out &
-run_subject {subject3} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject3}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject3}.out &
-run_subject {subject4} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject4}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject4}.out &
-run_subject {subject5} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject5}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject5}.out &
-run_subject {subject6} 2>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject6}.err 1>{scratch_path}/ukbb/slurm_logs/fmriprep_{subject6}.out &
 
 FAIL=0
 for job in `jobs -p`
@@ -93,7 +89,7 @@ echo $job
 done
 
 echo "End of multisubject slurm script with $FAIL failed job.";
-echo "Subjects {subject1}_{subject2}_{subject3}_{subject4}_{subject5}_{subject6}";
+echo "Subjects {subject1}_{subject2}";
 exit $FAIL
 
 """
@@ -169,9 +165,9 @@ if __name__ == "__main__":
         if jobs_count>=max_jobs_count:
             break
             
-        if len(queue) == 6:
-            jobName = (queue[0].replace("sub-","") + queue[1] + queue[2] + queue[3] + queue[4]+ queue[5]).replace("sub-","_")
-            gen_slurm_batch(queue[0],queue[1],queue[2],queue[3],queue[4],queue[5],jobName, scratch_path, email)
+        if len(queue) == 2:
+            jobName = (queue[0].replace("sub-","") + queue[1]).replace("sub-","_")
+            gen_slurm_batch(queue[0],queue[1],jobName, scratch_path, email)
             slurm_cmd = f"sbatch {scratch_path}/ukbb/.slurm_multisubjects/fmriprep_{jobName}.sh"
             try:
                 sbatch_output = subprocess.check_output(slurm_cmd, shell=True, text=True)
@@ -184,20 +180,12 @@ if __name__ == "__main__":
             if "Submitted batch job" in sbatch_output:
                 slurm_jobs[queue[0]] = int(sbatch_output.split(" ")[-1])
                 slurm_jobs[queue[1]] = int(sbatch_output.split(" ")[-1])
-                slurm_jobs[queue[2]] = int(sbatch_output.split(" ")[-1])
-                slurm_jobs[queue[3]] = int(sbatch_output.split(" ")[-1])
-                slurm_jobs[queue[4]] = int(sbatch_output.split(" ")[-1])
-                slurm_jobs[queue[5]] = int(sbatch_output.split(" ")[-1])
                 jobs_count += 1
                 job_history[str(int(sbatch_output.split(" ")[-1]))] = queue
             else:
                 print(f"Failed to launch subject {subject}")
                 slurm_jobs[queue[0]] = -1
                 slurm_jobs[queue[1]] = -1
-                slurm_jobs[queue[2]] = -1
-                slurm_jobs[queue[3]] = -1
-                slurm_jobs[queue[4]] = -1
-                slurm_jobs[queue[5]] = -1
             
             queue = []
             

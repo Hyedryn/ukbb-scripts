@@ -74,10 +74,12 @@ if __name__ == "__main__":
             state = subjects_state[subject][last_job]
             if state in ["NODE_FAIL"]:
                 pass
-            elif state in ["TIMEOUT"]:
+            elif state in ["Cjh+"]:
+                pass
+            elif state in ["TIMEOUT", "CANCELLED+"]:
                 print(f"Subject {subject} timeout, relaunching needed with longer timeout!")
                 print(subprocess.check_output(f"sacct --jobs={last_job} -n -o jobid%20,state,Elapsed,Timelimit --starttime=2023-03-01 -u {username}", shell=True, text=True).partition("\n")[0])
-                gen_slurm_batch(subject, scratch_path, email, timeout="48:00:00")
+                gen_slurm_batch(subject, scratch_path, email, timeout="58:00:00")
                 #continue
             elif state in ["FAILED"]:
                 print(f"Subject {subject} failed, investigation needed!")

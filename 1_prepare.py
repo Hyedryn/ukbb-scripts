@@ -45,7 +45,7 @@ def gen_folder_structure(scratch_path):
     archived_subjects_path = os.path.join(script_path,"data","archived_subjects.json")
     if not os.path.exists(archived_subjects_path):
         with open(archived_subjects_path,"x") as json_file:
-            json.dump({}, json_file, indent=4)
+            json.dump([], json_file, indent=4)
             
     bids_filters_path = os.path.join(scratch_path,"ukbb","bids_filters.json")
     if not os.path.exists(bids_filters_path):

@@ -51,6 +51,7 @@ def get_job_state(job_id):
     return state
     
 if __name__ == "__main__":
+    load_dotenv()
     scratch_path = os.getenv('SCRATCH_PATH')
     slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","slurm_jobs.json")
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
@@ -94,9 +95,14 @@ if __name__ == "__main__":
             if os.path.exists(os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")) and os.path.exists(os.path.join(scratch_path,"ukbb","COMPLETED",subject)):
                 print(f"Subject {subject} flaged as {state} but is COMPLETED!")
                 state = "COMPLETED"
+            elif os.path.exists(os.path.join(scratch_path,"ukbb","COMPLETED",subject)) and subject in archived_subjects:
+                state = "ARCHIVED"
             elif os.path.exists(os.path.join(scratch_path,"ukbb","FAILED",subject)) and state != "FAILED":
                 print(f"Subject {subject} flaged as {state} but is FAILED!")
                 state = "FAILED"
+        
+        if state == "COMPLETED" and subject in archived_subjects:
+            state = "ARCHIVED"
         
         if subject not in subjects_state:
             subjects_state[subject] = {}
@@ -105,7 +111,6 @@ if __name__ == "__main__":
         
         #Will be displayed as archived
         if state == "COMPLETED" and subject in archived_subjects:
-            #subjects_state[subject]["9999999999"] = "ARCHIVED"
             state = "ARCHIVED"
         
         if state_job in status.keys():

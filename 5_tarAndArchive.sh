@@ -5,7 +5,7 @@
 #SBATCH --error=/lustre04/scratch/qdessain/ukbb/nearline/fmriprep_archive.err
 #SBATCH --time=23:30:00
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=1024M
+#SBATCH --mem-per-cpu=3896M
 #SBATCH --mail-user=quentin.dessain@uclouvain.be
 #SBATCH --mail-type=FAIL
 

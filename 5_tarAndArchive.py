@@ -69,7 +69,7 @@ if __name__ == "__main__":
         tar_archive = os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")
         ack_file = os.path.join(scratch_path,"ukbb","COMPLETED",subject)
         if (state == "COMPLETED") and os.path.exists(tar_archive) and os.path.exists(ack_file) and (subject not in archived_subjects):
-            shutil.copy(tar_archive, tmp_archive_dir)
+            shutil.move(tar_archive, tmp_archive_dir)
             archive_filecount+=1
             archived_subjects.append(subject)
             newly_archived_subjects.append(subject)
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         tar_archive = os.path.join(scratch_path,"ukbb","fmriprep",f"{subject}_fmriprep.tar.gz")
         ack_file = os.path.join(scratch_path,"ukbb","COMPLETED",subject)
         if (state == "COMPLETED") and os.path.exists(tar_archive) and os.path.exists(ack_file):
-            shutil.rmtree(tar_archive) 
+            os.remove(tar_archive) 
         else:
             print(f"Error, tar_archive for subject {subject} do not exist")
     

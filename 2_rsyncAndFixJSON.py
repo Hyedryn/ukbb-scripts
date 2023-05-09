@@ -9,9 +9,9 @@ def rsync_subject(subject_id, bids_path, output_folder, scratch_path, cluster_us
     """Rsync a subject from the BIDS dataset to the output folder."""
     if cluster_username_addr == None:
         cluster_username_addr = ""
-    subject_path = bids_path + subject_id + "/"
-    output_path = output_folder + subject_id
-    cmd = 'rsync -arl {}{} {}'.format(cluster_username_addr, subject_path, output_path)
+    subject_path = os.path.join(bids_path, subject_id)
+    output_path = os.path.join(output_folder, subject_id)
+    cmd = 'rsync -arl {}{}/ {}'.format(cluster_username_addr, subject_path, output_path)
     std_output = open(os.path.join(scratch_path,"ukbb","scripts","data","rsync.log"), "a")
     subprocess.call(cmd, shell=True)#, stdout=std_output)
     print("Subject {} rsynced".format(subject_id), file=std_output)
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         json_stats = json.load(json_file)
         print("[fMRI stats] noJSON: ",len(json_stats["noJSON"]), "wrongSliceTiming: ",len(json_stats["wrongSliceTiming"]), "validJSON: ",len(json_stats["validJSON"]))
         print("[fMRI stats] total entries: ",len(json_stats["noJSON"])+len(json_stats["wrongSliceTiming"])+len(json_stats["validJSON"]))
-    ukbb_subjects = json_stats["validJSON"] + json_stats["noJSON"] + json_stats["wrongSliceTiming"]
+    ukbb_subjects = json_stats["validJSON"] + json_stats["noJSON"]# + json_stats["wrongSliceTiming"]
     
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     archived_subjects_path = os.path.join(scratch_path,"ukbb","scripts","data","archived_subjects.json")
@@ -151,7 +151,7 @@ if __name__ == "__main__":
         archived_subjects = json.load(json_file)
     
     output_path = os.path.join(scratch_path,"ukbb","ukbb_bids")
-    number_of_active_subject = subprocess.checkoutput(f"cd {output_path}; ls -l | wc -l")
+    number_of_active_subject = int(subprocess.check_output(f"cd {output_path}; ls -l | wc -l", shell=True, text=True))-1
     
     print(f"There are already {number_of_active_subject} active subjects.")
 
@@ -180,7 +180,7 @@ if __name__ == "__main__":
         print("Starting rsync of {} subjects among {} subjects.".format(len(batch),len(ukbb_subjects)))
         if multicore:
             i = 0
-            with Pool(20) as pool:
+            with Pool(50) as pool:
                 items = [(subject, bids_path, output_path, scratch_path, cluster_username_addr) for subject in batch]
                 for subject in pool.starmap(rsync_subject, items):
                     print("rsyncing subject: ", subject, "(",i,"/",batch_size,")", "(",100*(i/batch_size),"%)")
