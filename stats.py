@@ -79,6 +79,8 @@ if __name__ == "__main__":
         
     print("Getting all job states...")
     states_dic = get_all_job_state()
+    states_dic[0] = "COMPLETED"
+    states_dic[1] = "FAILED"
          
     analysed_job = {}
     for subject in slurm_jobs.keys():
