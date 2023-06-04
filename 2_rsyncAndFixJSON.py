@@ -4,6 +4,8 @@ import os
 from multiprocessing.pool import Pool
 import time
 from dotenv import load_dotenv
+import zipfile
+from pathlib import Path
 
 def rsync_subject(subject_id, bids_path, output_folder, scratch_path, cluster_username_addr=""):
     """Rsync a subject from the BIDS dataset to the output folder."""
@@ -17,8 +19,28 @@ def rsync_subject(subject_id, bids_path, output_folder, scratch_path, cluster_us
     print("Subject {} rsynced".format(subject_id), file=std_output)
     std_output.close()
     
+    
     return subject_id
       
+      
+def sync_freesurfer_subject(subject_id, freesurfer_path, scratch_path):
+    sub = subject_id.split("-")[1]
+    subject_path = os.path.join(freesurfer_path, f"{sub}_20263_2_0.zip")
+    output_path = os.path.join(scratch_path,"ukbb","ukbb_freesurfer",subject_id + "_freesurfer.zip")
+    if not os.path.exists(output_path):
+        if os.path.exists(subject_path):
+            cmd = 'rsync -arl {} {}'.format(subject_path, output_path)
+            subprocess.call(cmd, shell=True)
+            #output_path_tmp = os.path.join(scratch_path,"ukbb","ukbb_freesurfer_tmp",subject_id)
+            #os.makedirs(output_path, exist_ok=True)
+            #os.makedirs(output_path_tmp, exist_ok=True)
+            #with zipfile.ZipFile(subject_path, 'r') as zip_ref:
+            #    zip_ref.extractall(output_path_tmp)
+            #os.rename(os.path.join(output_path_tmp,"FreeSurfer"),output_path)
+        else:
+            print("No precomputed freesurfer output! More time needed for fmriprep!!")
+        
+    return subject_id
         
 def fix_bids_datastructure(batch_subjects, scratch_path):
     with open(os.path.join(scratch_path,"ukbb","scripts","data","json_stats.json"), "r") as json_file:
@@ -33,6 +55,7 @@ def fix_bids_datastructure(batch_subjects, scratch_path):
     tot = len(json_stats["noJSON"])+len(json_stats["wrongSliceTiming"])+len(json_stats["validJSON"])
     
 
+    missing_json = []
     for subject in json_stats["wrongSliceTiming"] + json_stats["validJSON"]:
         if os.path.exists(os.path.join(scratch_path,"ukbb","ukbb_bids", subject)):
             json_path = os.path.join(scratch_path,"ukbb","ukbb_bids", subject,"func",subject+"_task-rest_bold.json")
@@ -46,6 +69,7 @@ def fix_bids_datastructure(batch_subjects, scratch_path):
                     json.dump(json_data, json_file, indent=4)
             else:
                 print("ERROR: no json for subject {}".format(subject))
+                missing_json.append(subject)
 
             json_sbref_path = os.path.join(scratch_path,"ukbb","ukbb_bids", subject, "func", subject + "_task-rest_sbref.json")
             if os.path.exists(json_sbref_path):
@@ -87,7 +111,7 @@ def fix_bids_datastructure(batch_subjects, scratch_path):
         "PhaseEncodingDirection": "j-",
         "TaskName": "rest"
     }
-    for subject in json_stats["noJSON"]:
+    for subject in json_stats["noJSON"] + missing_json:
         if os.path.exists(os.path.join(scratch_path,"ukbb","ukbb_bids", subject)):
             json_path = os.path.join(scratch_path,"ukbb","ukbb_bids", subject,"func",subject+"_task-rest_bold.json")
             with open(json_path, "w") as json_file:
@@ -131,6 +155,7 @@ if __name__ == "__main__":
     multicore=True
     scratch_path=os.getenv('SCRATCH_PATH')
     bids_path=os.getenv('UKBB_BIDS_FOLDER')
+    freesurfer_path=os.getenv('UKBB_FREESURFER_FOLDER')
     batch_size=int(os.getenv('BATCH_SIZE'))
     cluster_username_addr=os.getenv('CLUSTER_USERNAME_ADDR')
     
@@ -141,7 +166,7 @@ if __name__ == "__main__":
         json_stats = json.load(json_file)
         print("[fMRI stats] noJSON: ",len(json_stats["noJSON"]), "wrongSliceTiming: ",len(json_stats["wrongSliceTiming"]), "validJSON: ",len(json_stats["validJSON"]))
         print("[fMRI stats] total entries: ",len(json_stats["noJSON"])+len(json_stats["wrongSliceTiming"])+len(json_stats["validJSON"]))
-    ukbb_subjects = json_stats["validJSON"] + json_stats["noJSON"]# + json_stats["wrongSliceTiming"]
+    ukbb_subjects = json_stats["validJSON"] + json_stats["noJSON"] + json_stats["wrongSliceTiming"]
     
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     archived_subjects_path = os.path.join(scratch_path,"ukbb","scripts","data","archived_subjects.json")
@@ -179,6 +204,14 @@ if __name__ == "__main__":
     if rsync_batch:
         print("Starting rsync of {} subjects among {} subjects.".format(len(batch),len(ukbb_subjects)))
         if multicore:
+            i=0
+            print("Starting freesurfer sync")
+            with Pool(50) as pool:
+                items = [(subject, freesurfer_path, scratch_path) for subject in batch]
+                for subject in pool.starmap(sync_freesurfer_subject, items):
+                    print("syncing freesurfer subject: ", subject, "(",i,"/",batch_size,")", "(",100*(i/batch_size),"%)")
+                    i += 1
+            print("Starting rsync")
             i = 0
             with Pool(50) as pool:
                 items = [(subject, bids_path, output_path, scratch_path, cluster_username_addr) for subject in batch]
@@ -190,6 +223,11 @@ if __name__ == "__main__":
             for subject in batch:
                 print("rsyncing subject: ", subject, "(",i,"/",batch_size,")", "(",100*(i/batch_size),"%)")
                 rsync_subject(subject, bids_path, output_path, scratch_path, cluster_username_addr)
+                
+                #Sync freesurfer
+                print("Sync freesurfer")
+                sync_freesurfer_subject(subject, freesurfer_path, scratch_path)
+                
                 i += 1
   
     #####################################################

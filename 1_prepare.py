@@ -24,6 +24,7 @@ def gen_folder_structure(scratch_path):
     os.makedirs(os.path.join(scratch_path,"ukbb","tmp_archive"), exist_ok = True)
     os.makedirs(os.path.join(scratch_path,"ukbb","ukbb_bids"), exist_ok = True)
     os.makedirs(os.path.join(scratch_path,"ukbb","workdir"), exist_ok = True)
+    os.makedirs(os.path.join(scratch_path,"ukbb","ukbb_freesurfer"), exist_ok = True)
     
     script_path = os.path.join(scratch_path,"ukbb","scripts")
     

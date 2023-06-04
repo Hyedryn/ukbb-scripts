@@ -15,6 +15,7 @@ if __name__ == "__main__":
     max_jobs_count=int(os.getenv('MAX_JOBS_COUNT'))
     email=os.getenv('SLURM_EMAIL')
     username=os.getenv('USERNAME')
+    ressource_account=os.getenv('RESSOURCE_ACCOUNT')
     
     with open(os.path.join(scratch_path,"ukbb","scripts","data","json_stats.json"), "r") as json_file:
         json_stats = json.load(json_file)
@@ -79,7 +80,7 @@ if __name__ == "__main__":
             elif state in ["TIMEOUT", "CANCELLED+"]:
                 print(f"Subject {subject} timeout, relaunching needed with longer timeout!")
                 print(subprocess.check_output(f"sacct --jobs={last_job} -n -o jobid%20,state,Elapsed,Timelimit --starttime=2023-03-01 -u {username}", shell=True, text=True).partition("\n")[0])
-                gen_slurm_batch(subject, scratch_path, email, timeout="58:00:00")
+                gen_slurm_batch(subject, scratch_path, email, ressource_account, timeout="58:00:00")
                 #continue
             elif state in ["FAILED"]:
                 print(f"Subject {subject} failed, investigation needed!")
@@ -123,6 +124,6 @@ if __name__ == "__main__":
         
     print("All slurm batches launched!")
     
-    time.sleep(3)
+    time.sleep(4)
     print(subprocess.check_output(f"cd {script_path}; python stats.py", shell=True, text=True))
         
