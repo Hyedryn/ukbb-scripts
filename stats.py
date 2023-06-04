@@ -3,6 +3,50 @@ import os
 import subprocess
 from dotenv import load_dotenv
 
+
+def update_active_subjects(scratch_path):
+    
+    active_subjects = []
+    print("Registering active subjects")
+    
+    ukbb_bids_subjects = os.listdir(os.path.join(scratch_path, "ukbb", "ukbb_bids"))
+    for subject in ukbb_bids_subjects:
+        if "sub-" in subject:
+            active_subjects.append(subject)
+    print(len(active_subjects))
+    ukbb_freesurfer_subjects = os.listdir(os.path.join(scratch_path, "ukbb", "ukbb_freesurfer"))
+    for subject in ukbb_freesurfer_subjects:
+        if "sub-" in subject  and "_freesurfer.zip" in subject:
+            active_subjects.append(subject.split("_")[0] )
+    print(len(active_subjects))
+    ukbb_fmriprep_subjects = os.listdir(os.path.join(scratch_path, "ukbb", "fmriprep"))
+    for subject in ukbb_fmriprep_subjects:
+        if "sub-" in subject and "_fmriprep.tar.gz" in subject:
+            active_subjects.append(subject.split("_")[0] )
+    print(len(active_subjects))
+    slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","slurm_jobs.json")
+    with open(slurm_jobs_path,"r") as json_file:
+            slurm_jobs = json.load(json_file)
+    ukbb_jobs_subjects = slurm_jobs.keys()
+    for subject in ukbb_jobs_subjects:
+        active_subjects.append(subject)
+    print(len(active_subjects))
+    archived_subjects_path = os.path.join(scratch_path,"ukbb","scripts","data","archived_subjects.json")
+    with open(archived_subjects_path,"r") as json_file:
+        archived_subjects = json.load(json_file)
+    for subject in archived_subjects:
+        active_subjects.append(subject)
+    print(len(active_subjects))
+    
+    print("Removing duplicate subjects")
+    active_subjects = list(dict.fromkeys(active_subjects))
+    print(len(active_subjects))
+    
+    active_subjects_path = os.path.join(scratch_path, "ukbb", "scripts", "data", "active_subjects.json")
+    with open(active_subjects_path,"w") as json_file:
+        json.dump(active_subjects, json_file, indent=4)
+    
+    
 def get_all_job_state():
     """
     Retrieve the state of a job through the sacct bash command offered by the slurm Workload Manager.
@@ -135,3 +179,10 @@ if __name__ == "__main__":
         
     with open(subjects_state_path,"w") as json_file:
         json.dump(subjects_state, json_file, indent=4)
+        
+        
+    update_active_subjects(scratch_path)
+
+
+
+        
