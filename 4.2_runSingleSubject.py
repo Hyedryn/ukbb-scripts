@@ -77,14 +77,26 @@ if __name__ == "__main__":
                 pass
             elif state in ["Cjh+"]:
                 pass
-            elif state in ["TIMEOUT", "CANCELLED+"]:
+            elif state in ["TIMEOUT"]:
                 print(f"Subject {subject} timeout, relaunching needed with longer timeout!")
                 print(subprocess.check_output(f"sacct --jobs={last_job} -n -o jobid%20,state,Elapsed,Timelimit --starttime=2023-03-01 -u {username}", shell=True, text=True).partition("\n")[0])
-                gen_slurm_batch(subject, scratch_path, email, ressource_account, timeout="58:00:00")
+                gen_slurm_batch(subject, scratch_path, email, ressource_account, timeout="30:00:00")
                 #continue
             elif state in ["FAILED"]:
                 print(f"Subject {subject} failed, investigation needed!")
                 print(subprocess.check_output(f"sacct --jobs={last_job} -n -o jobid%20,state,Elapsed,Timelimit --starttime=2023-03-01 -u {username}", shell=True, text=True).partition("\n")[0])
+                #if int(last_job) > 10:
+                #    output_time = subprocess.check_output(f"sacct --jobs={last_job} -n -o Elapsed --starttime=2023-03-01 -u {username}", shell=True, text=True).partition("\n")[0].strip()
+                #    import datetime
+                #    x_time = time.strptime(output_time,'%H:%M:%S')
+                #    total_sec = datetime.timedelta(hours=x_time.tm_hour,minutes=x_time.tm_min,seconds=x_time.tm_sec).total_seconds()
+                #    print(total_sec)
+                #    if total_sec > 3600:
+                #        pass
+                #    else:
+                #        continue
+                #else:
+                #    continue
                 continue
             elif state in ["PENDING", "RUNNING", "COMPLETED", "ARCHIVED"]:
                 continue
@@ -92,6 +104,7 @@ if __name__ == "__main__":
                 print(f"unknow state {state} for subject {subject}")
                 continue
         
+            
         slurm_cmd = f"sbatch {scratch_path}/ukbb/.slurm/fmriprep_{subject}.sh"
         try:
             sbatch_output = subprocess.check_output(slurm_cmd, shell=True, text=True)

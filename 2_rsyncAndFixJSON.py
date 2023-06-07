@@ -158,6 +158,8 @@ if __name__ == "__main__":
     freesurfer_path=os.getenv('UKBB_FREESURFER_FOLDER')
     batch_size=int(os.getenv('BATCH_SIZE'))
     cluster_username_addr=os.getenv('CLUSTER_USERNAME_ADDR')
+    complementary_cluster_name = os.getenv('COMPLEMENTARY_CLUSTER_NAME')
+    complementary_cluster_login = os.getenv('COMPLEMENTARY_CLUSTER_LOGIN')
     
     rsync_batch=True
     fix_BIDS=True
@@ -179,6 +181,12 @@ if __name__ == "__main__":
     number_of_active_subject = int(subprocess.check_output(f"cd {output_path}; ls -l | wc -l", shell=True, text=True))-1
     
     print(f"There are already {number_of_active_subject} active subjects.")
+    
+    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+    print(active_subject_cmd)
+    with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", "r") as json_file:
+        active_subject = json.load(json_file)
+    print(f"Number of active subjects on {complementary_cluster_name} cluster: ",len(active_subject))
 
     batch = []
     for subject in ukbb_subjects:
@@ -187,6 +195,8 @@ if __name__ == "__main__":
         elif os.path.exists(os.path.join(output_path,subject)):
             batch.append(subject)
         elif subject in archived_subjects:
+            pass
+        elif subject in active_subject:
             pass
         elif subject in subjects_state:
             print(f"[Warning] Subject {subject} in subject_state and not archived but no input bids dataset found!")

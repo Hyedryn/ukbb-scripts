@@ -4,8 +4,24 @@ import os
 from multiprocessing.pool import Pool
 import time
 from dotenv import load_dotenv
+import zipfile
 
-def gen_slurm_batch(subject,scratch_path,email,ressource_account,timeout="17:00:00"):
+def gen_slurm_batch(subject,scratch_path,email,ressource_account,timeout="17:00:00",freesurfer=False):
+    
+    freesurfer_block = ""
+    if freesurfer:
+        freesurfer_block = f"""
+
+if [ -f "$freesurfer_subject" ]; then
+    echo "Using precomputed freesurfer output."
+    mkdir -p ${{SLURM_TMPDIR}}/freesurfer/
+    mkdir -p ${{SLURM_TMPDIR}}/freesurfer/{subject}/
+    cd ${{SLURM_TMPDIR}}/freesurfer/{subject}/ ; unzip -qq $freesurfer_subject ; mv FreeSurfer/* . ; rm FreeSurfer/ -R
+    #rsync -rlt {scratch_path}/ukbb/ukbb_freesurfer/{subject}/ ${{SLURM_TMPDIR}}/freesurfer/{subject}/
+    freesurfer_parameter="--fs-subjects-dir /DATA/freesurfer/"
+fi
+
+"""
     
     slurm_batch = f"""#!/bin/bash
 #SBATCH --account={ressource_account}
@@ -14,7 +30,7 @@ def gen_slurm_batch(subject,scratch_path,email,ressource_account,timeout="17:00:
 #SBATCH --error={scratch_path}/ukbb/slurm_logs/fmriprep_{subject}.err
 #SBATCH --time={timeout}
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=6096M
+#SBATCH --mem-per-cpu=6496M
 #SBATCH --mail-user={email}
 #SBATCH --mail-type=FAIL
 
@@ -29,20 +45,18 @@ rm {scratch_path}/ukbb/COMPLETED/{subject} -f
 
 #copying input dataset into local scratch space
 mkdir -p ${{SLURM_TMPDIR}}/ukbb/{subject}/
-mkdir -p ${{SLURM_TMPDIR}}/freesurfer/{subject}/
 rsync -rlt --exclude "*.tar.gz" {scratch_path}/ukbb/dataset_template/ ${{SLURM_TMPDIR}}/ukbb/
 rsync -rlt {scratch_path}/ukbb/ukbb_bids/{subject}/ ${{SLURM_TMPDIR}}/ukbb/{subject}/
 rsync -rlt {scratch_path}/ukbb/bids_filters.json $SLURM_TMPDIR/bids_filters.json
+
 freesurfer_subject={scratch_path}/ukbb/ukbb_freesurfer/{subject}_freesurfer.zip
-if [ -f "$freesurfer_subject" ]; then
-    echo "Using precomputed freesurfer output."
-    cd ${{SLURM_TMPDIR}}/freesurfer/{subject}/ ; unzip -qq $freesurfer_subject ; mv FreeSurfer/* . ; rm FreeSurfer/ -R
-    #rsync -rlt {scratch_path}/ukbb/ukbb_freesurfer/{subject}/ ${{SLURM_TMPDIR}}/freesurfer/{subject}/
-fi
+freesurfer_parameter=""
+
+{freesurfer_block}
 
 cd ${{SLURM_TMPDIR}}
 
-singularity run --cleanenv -B ${{SLURM_TMPDIR}}:/DATA -B ${{HOME}}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ /lustre07/scratch/qdessain/fmriprep-20.2.7lts.sif -w /DATA/fmriprep_work --participant-label {subject} --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym --output-layout bids --notrack --write-graph --omp-nthreads 1 --nprocs 1 --mem_mb 5950 --bids-filter-file /DATA/bids_filters.json --ignore slicetiming --fs-subjects-dir /DATA/freesurfer/ --stop-on-first-crash --random-seed 0 /DATA/ukbb /DATA/ukbb/derivatives/fmriprep participant 
+singularity run --cleanenv -B ${{SLURM_TMPDIR}}:/DATA -B ${{HOME}}/.cache/templateflow:/templateflow -B /etc/pki:/etc/pki/ /lustre07/scratch/qdessain/fmriprep-20.2.7lts.sif -w /DATA/fmriprep_work --participant-label {subject} --output-spaces MNI152NLin2009cAsym MNI152NLin6Asym --output-layout bids --notrack --write-graph --omp-nthreads 1 --nprocs 1 --mem_mb 6150 --bids-filter-file /DATA/bids_filters.json --ignore slicetiming ${{freesurfer_parameter}} --stop-on-first-crash --random-seed 0 /DATA/ukbb /DATA/ukbb/derivatives/fmriprep participant 
 fmriprep_exitcode=$?
 
 if [ $fmriprep_exitcode -ne 0 ]
@@ -115,10 +129,12 @@ if __name__ == "__main__":
         print(f"Generation of {effective_batch_size} slurm batches...")
         i = 0
         for subject in effective_batch:
-            if os.path.exists(os.path.join(scratch_path,"ukbb","ukbb_freesurfer",f"{subject}_freesurfer.zip")):
-                gen_slurm_batch(subject, scratch_path, email, ressource_account,timeout="14:00:00")
+            freesurfer_sub_zip = os.path.join(scratch_path,"ukbb","ukbb_freesurfer",f"{subject}_freesurfer.zip")
+            fs_orig = "FreeSurfer/mri/orig/001.mgz"
+            if os.path.exists(freesurfer_sub_zip) and fs_orig in zipfile.ZipFile(freesurfer_sub_zip).namelist():
+                gen_slurm_batch(subject, scratch_path, email, ressource_account,timeout="15:00:00",freesurfer=True)
             else:
-                gen_slurm_batch(subject, scratch_path, email, ressource_account,timeout="19:00:00")
+                gen_slurm_batch(subject, scratch_path, email, ressource_account,timeout="19:00:00",freesurfer=False)
             if i % 500 == 0:
                 print("",i,"/",len(effective_batch), "slurm batches generated (",100*(i/len(effective_batch)) ,"%)")
             i += 1

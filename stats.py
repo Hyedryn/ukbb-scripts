@@ -4,7 +4,7 @@ import subprocess
 from dotenv import load_dotenv
 
 
-def update_active_subjects(scratch_path):
+def update_active_subjects(scratch_path, cluster_name):
     
     active_subjects = []
     print("Registering active subjects")
@@ -42,7 +42,7 @@ def update_active_subjects(scratch_path):
     active_subjects = list(dict.fromkeys(active_subjects))
     print(len(active_subjects))
     
-    active_subjects_path = os.path.join(scratch_path, "ukbb", "scripts", "data", "active_subjects.json")
+    active_subjects_path = os.path.join(scratch_path, "ukbb", "scripts", "data", f"active_subjects_{cluster_name}.json")
     with open(active_subjects_path,"w") as json_file:
         json.dump(active_subjects, json_file, indent=4)
     
@@ -97,6 +97,7 @@ def get_job_state(job_id):
 if __name__ == "__main__":
     load_dotenv()
     scratch_path = os.getenv('SCRATCH_PATH')
+    cluster_name = os.getenv('CLUSTER_NAME')
     slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","slurm_jobs.json")
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     failed_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_error.json")
@@ -181,7 +182,7 @@ if __name__ == "__main__":
         json.dump(subjects_state, json_file, indent=4)
         
         
-    update_active_subjects(scratch_path)
+    update_active_subjects(scratch_path, cluster_name)
 
 
 
