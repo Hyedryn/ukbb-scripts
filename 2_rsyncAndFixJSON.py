@@ -6,6 +6,7 @@ import time
 from dotenv import load_dotenv
 import zipfile
 from pathlib import Path
+import nibabel as nb
 
 def rsync_subject(subject_id, bids_path, output_folder, scratch_path, cluster_username_addr=""):
     """Rsync a subject from the BIDS dataset to the output folder."""
@@ -150,6 +151,42 @@ def fix_bids_datastructure(batch_subjects, scratch_path):
             print("[T1] ",i,"/",len(json_stats_T1["noJSON"]), "subjects processed (",100*(i/len(json_stats_T1["noJSON"])) ,"%)")
         i=i+1
      
+     
+def fix_nifti_header(subject, scratch_path):
+    def set_xyzt_units(img, xyz='mm', t='sec'):
+        header = img.header.copy()
+        header.set_xyzt_units(xyz=xyz, t=t)
+        return img.__class__(img.get_fdata().copy(), img.affine, header)
+        
+    def set_dim_info(img, slice=3,freq=1,phase=2):
+        header = img.header.copy()
+        header.set_dim_info(slice=3,freq=1,phase=2)
+        return img.__class__(img.get_fdata().copy(), img.affine, header)
+
+    def fixer(img_path):
+        if os.path.exists(img_path):
+            fixed_img = nb.load(img_path)
+            fix = False
+            if fixed_img.header.get_xyzt_units() == ('unknown', 'unknown'):
+                print("Fixed xyzt units",img_path)
+                fixed_img = set_xyzt_units(fixed_img)
+                fix = True
+            #if fixed_img.header.get_dim_info() == (None, None, None):
+            #    print("Fixed dim info")
+            #    fixed_img = set_xyzt_units(fixed_img)
+            #    fix = True
+            if fix:
+                fixed_img.to_filename(img_path)
+                print("Done")
+
+    bold_path = os.path.join(scratch_path,"ukbb","ukbb_bids", subject,"func",subject+"_task-rest_bold.nii.gz")
+    sbref_path = os.path.join(scratch_path,"ukbb","ukbb_bids", subject,"func",subject+"_task-rest_sbref.nii.gz")
+    
+    fixer(bold_path)
+    fixer(sbref_path)
+    
+
+
 if __name__ == "__main__":
     load_dotenv()
     multicore=True
@@ -161,8 +198,9 @@ if __name__ == "__main__":
     complementary_cluster_name = os.getenv('COMPLEMENTARY_CLUSTER_NAME')
     complementary_cluster_login = os.getenv('COMPLEMENTARY_CLUSTER_LOGIN')
     
-    rsync_batch=True
-    fix_BIDS=True
+    rsync_batch=False
+    fix_BIDS=False
+    fix_header=True
     
     with open(os.path.join(scratch_path,"ukbb","scripts","data","json_stats.json"), "r") as json_file:
         json_stats = json.load(json_file)
@@ -182,8 +220,8 @@ if __name__ == "__main__":
     
     print(f"There are already {number_of_active_subject} active subjects.")
     
-    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
-    print(active_subject_cmd)
+    #active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+    #print(active_subject_cmd)
     with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", "r") as json_file:
         active_subject = json.load(json_file)
     print(f"Number of active subjects on {complementary_cluster_name} cluster: ",len(active_subject))
@@ -253,4 +291,14 @@ if __name__ == "__main__":
     if fix_BIDS:
         print("Fixing BIDS datastructure for effective batch")
         fix_bids_datastructure(effective_batch,scratch_path=scratch_path)
+        
+    if fix_header:
+        print("Fixing BIDS header for effective batch")
+        i = 0
+        for sub in effective_batch:
+            fix_nifti_header(sub, scratch_path)
+            if i % int(effective_batch_size/200) == 0:
+                print(i,"/",effective_batch_size)
+            i += 1
+            
 
