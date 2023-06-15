@@ -98,6 +98,10 @@ if __name__ == "__main__":
     load_dotenv()
     scratch_path = os.getenv('SCRATCH_PATH')
     cluster_name = os.getenv('CLUSTER_NAME')
+    complementary_cluster_name = os.getenv('COMPLEMENTARY_CLUSTER_NAME')
+    complementary_cluster_login = os.getenv('COMPLEMENTARY_CLUSTER_LOGIN')
+    outside_cluster_name = os.getenv('OUTSIDE_CLUSTER_NAME')
+    outside_cluster_login = os.getenv('OUTSIDE_CLUSTER_LOGIN')
     slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","slurm_jobs.json")
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     failed_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_error.json")
@@ -126,6 +130,7 @@ if __name__ == "__main__":
     states_dic = get_all_job_state()
     states_dic[0] = "COMPLETED"
     states_dic[1] = "FAILED"
+    states_dic[2] = "FAILED"
          
     analysed_job = {}
     for subject in slurm_jobs.keys():
@@ -183,6 +188,13 @@ if __name__ == "__main__":
         
         
     update_active_subjects(scratch_path, cluster_name)
+    
+    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+    print("Updating active subjects (complementary):",active_subject_cmd)
+    
+    
+    active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
+    print("Updating active subjects (outside):",active_subject_cmd)
 
 
 

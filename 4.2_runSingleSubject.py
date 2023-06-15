@@ -104,7 +104,11 @@ if __name__ == "__main__":
                 print(f"unknow state {state} for subject {subject}")
                 continue
         
-            
+        if not os.path.exists(os.path.join(scratch_path,"ukbb","ukbb_bids",subject,"func",f"{subject}_task-rest_bold.nii.gz")):
+            slurm_jobs[subject] = 2
+            print(f"Subject {subject} nifti not found.")
+            continue
+        
         slurm_cmd = f"sbatch {scratch_path}/ukbb/.slurm/fmriprep_{subject}.sh"
         try:
             sbatch_output = subprocess.check_output(slurm_cmd, shell=True, text=True)
@@ -120,7 +124,7 @@ if __name__ == "__main__":
             job_history[str(int(sbatch_output.split(" ")[-1]))] = subject
         else:
             print(f"Failed to launch subject {subject}")
-            slurm_jobs[subject] = -1
+            slurm_jobs[subject] = -4
         
         if i % 500 == 0:
             print("",i,"/",len(effective_batch), "slurm batches launched (",100*(i/len(effective_batch)) ,"%)")
@@ -137,6 +141,6 @@ if __name__ == "__main__":
         
     print("All slurm batches launched!")
     
-    time.sleep(4)
+    time.sleep(6)
     print(subprocess.check_output(f"cd {script_path}; python stats.py", shell=True, text=True))
         

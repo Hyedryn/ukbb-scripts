@@ -197,6 +197,8 @@ if __name__ == "__main__":
     cluster_username_addr=os.getenv('CLUSTER_USERNAME_ADDR')
     complementary_cluster_name = os.getenv('COMPLEMENTARY_CLUSTER_NAME')
     complementary_cluster_login = os.getenv('COMPLEMENTARY_CLUSTER_LOGIN')
+    outside_cluster_name = os.getenv('OUTSIDE_CLUSTER_NAME')
+    outside_cluster_login = os.getenv('OUTSIDE_CLUSTER_LOGIN')
     
     rsync_batch=False
     fix_BIDS=False
@@ -220,8 +222,8 @@ if __name__ == "__main__":
     
     print(f"There are already {number_of_active_subject} active subjects.")
     
-    #active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
-    #print(active_subject_cmd)
+    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+    print(active_subject_cmd)
     with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", "r") as json_file:
         active_subject = json.load(json_file)
     print(f"Number of active subjects on {complementary_cluster_name} cluster: ",len(active_subject))
