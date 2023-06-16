@@ -224,10 +224,18 @@ if __name__ == "__main__":
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
     print(active_subject_cmd)
+
+    active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
+    print(active_subject_cmd)
+    
     with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", "r") as json_file:
         active_subject = json.load(json_file)
     print(f"Number of active subjects on {complementary_cluster_name} cluster: ",len(active_subject))
 
+    with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", "r") as json_file:
+        active_subject_outside = json.load(json_file)
+    print(f"Number of active subjects on {outside_cluster_name} cluster: ",len(active_subject_outside))
+    
     batch = []
     for subject in ukbb_subjects:
         if number_of_active_subject >= batch_size:
@@ -237,6 +245,8 @@ if __name__ == "__main__":
         elif subject in archived_subjects:
             pass
         elif subject in active_subject:
+            pass
+        elif subject in active_subject_outside:
             pass
         elif subject in subjects_state:
             print(f"[Warning] Subject {subject} in subject_state and not archived but no input bids dataset found!")
