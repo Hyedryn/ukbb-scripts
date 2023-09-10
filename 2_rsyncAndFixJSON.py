@@ -224,11 +224,8 @@ if __name__ == "__main__":
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
     print(active_subject_cmd)
-<<<<<<< Updated upstream
-
-=======
     
->>>>>>> Stashed changes
+    
     active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
     print(active_subject_cmd)
     

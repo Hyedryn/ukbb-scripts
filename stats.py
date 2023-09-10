@@ -133,10 +133,6 @@ if __name__ == "__main__":
     states_dic[0] = "COMPLETED"
     states_dic[1] = "FAILED"
     states_dic[2] = "FAILED"
-<<<<<<< Updated upstream
-=======
-         
->>>>>>> Stashed changes
          
     #### Beginning of connectome ####
     connectomes_status = {}
@@ -223,7 +219,6 @@ if __name__ == "__main__":
         json.dump(subjects_state, json_file, indent=4)
         
         
-<<<<<<< Updated upstream
     update_active_subjects(scratch_path, cluster_name)
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
@@ -232,14 +227,17 @@ if __name__ == "__main__":
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
     print("Updating active subjects (outside):",active_subject_cmd)
-=======
     #update_active_subjects(scratch_path, cluster_name)
->>>>>>> Stashed changes
 
-
-    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
-    print("Updating active subjects (complementary):",active_subject_cmd)
-
-    active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
-    print("Updating active subjects (outside):",active_subject_cmd)
+    try:
+        active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+        print("Updating active subjects (complementary):",active_subject_cmd)
+    except Exception as e:
+        print(e)
+    
+    try:
+        active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
+        print("Updating active subjects (outside):",active_subject_cmd)
+    except Exception as e:
+        print(e)
         
