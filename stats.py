@@ -69,6 +69,8 @@ def get_all_job_state():
         tmp = tmp.split(" ")
         if len(tmp) != 2:
             continue
+        if "." in tmp[0]:
+            continue
         states_dic[int(tmp[0])] = tmp[1]
     return states_dic
 
@@ -131,7 +133,41 @@ if __name__ == "__main__":
     states_dic[0] = "COMPLETED"
     states_dic[1] = "FAILED"
     states_dic[2] = "FAILED"
+<<<<<<< Updated upstream
+=======
          
+>>>>>>> Stashed changes
+         
+    #### Beginning of connectome ####
+    connectomes_status = {}
+    connectomes_slurm_jobs_path = os.path.join(scratch_path,"ukbb","scripts","data","connectomes_slurm_jobs.json")
+    connectomes_state_path = os.path.join(scratch_path,"ukbb","scripts","data","connectomes_state.json")
+    with open(connectomes_state_path,"r") as json_file:
+        connectomes_state = json.load(json_file) 
+    with open(connectomes_slurm_jobs_path,"r") as json_file:
+        connectomes_slurm_jobs = json.load(json_file)
+    connectomes_analysed_job = {}
+    for connectome in connectomes_slurm_jobs.keys():
+        new = connectomes_slurm_jobs[connectome] not in connectomes_analysed_job
+        if new:
+            state = states_dic[connectomes_slurm_jobs[connectome]]
+            connectomes_analysed_job[connectomes_slurm_jobs[connectome]] = state
+        else:
+            state = connectomes_analysed_job[connectomes_slurm_jobs[connectome]]
+        if connectome not in connectomes_state:
+            connectomes_state[connectome] = {}
+        connectomes_state[connectome][str(connectomes_slurm_jobs[connectome])] = state
+        
+        if state in connectomes_status.keys():
+            connectomes_status[state] += 1
+        else:
+            connectomes_status[state] = 1
+            
+    print("[Connectome] Job status: ", connectomes_status)
+    with open(connectomes_state_path,"w") as json_file:
+        json.dump(connectomes_state, json_file, indent=4)
+    #### End of connectome ####
+            
     analysed_job = {}
     for subject in slurm_jobs.keys():
         new = slurm_jobs[subject] not in analysed_job
@@ -187,6 +223,7 @@ if __name__ == "__main__":
         json.dump(subjects_state, json_file, indent=4)
         
         
+<<<<<<< Updated upstream
     update_active_subjects(scratch_path, cluster_name)
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
@@ -195,7 +232,14 @@ if __name__ == "__main__":
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
     print("Updating active subjects (outside):",active_subject_cmd)
+=======
+    #update_active_subjects(scratch_path, cluster_name)
+>>>>>>> Stashed changes
 
 
+    active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
+    print("Updating active subjects (complementary):",active_subject_cmd)
 
+    active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
+    print("Updating active subjects (outside):",active_subject_cmd)
         

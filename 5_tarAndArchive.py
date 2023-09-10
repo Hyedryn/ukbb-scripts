@@ -99,10 +99,10 @@ if __name__ == "__main__":
         json.dump(archived_subjects, json_file, indent=4)
     
     # Rsync to nearline
-    p = subprocess.run(f"rsync -rlt {tar_path} {nearline_path}", shell=True, text=True)
-    if p.returncode != 0:
-        print("Exception occured when syncing the archive to nearline! ", p.returncode)
-        exit(p.returncode)
+    #p = subprocess.run(f"rsync -rlt {tar_path} {nearline_path}", shell=True, text=True)
+    #if p.returncode != 0:
+    #    print("Exception occured when syncing the archive to nearline! ", p.returncode)
+    #    exit(p.returncode)
     
     # Clean tmp dir
     shutil.rmtree(tmp_archive_dir) 

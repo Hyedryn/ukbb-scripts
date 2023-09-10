@@ -209,7 +209,7 @@ if __name__ == "__main__":
         print("[fMRI stats] noJSON: ",len(json_stats["noJSON"]), "wrongSliceTiming: ",len(json_stats["wrongSliceTiming"]), "validJSON: ",len(json_stats["validJSON"]))
         print("[fMRI stats] total entries: ",len(json_stats["noJSON"])+len(json_stats["wrongSliceTiming"])+len(json_stats["validJSON"]))
     ukbb_subjects = json_stats["validJSON"] + json_stats["noJSON"] + json_stats["wrongSliceTiming"]
-    
+    ukbb_subjects.reverse()
     subjects_state_path = os.path.join(scratch_path,"ukbb","scripts","data","subjects_state.json")
     archived_subjects_path = os.path.join(scratch_path,"ukbb","scripts","data","archived_subjects.json")
     with open(subjects_state_path,"r") as json_file:
@@ -224,13 +224,21 @@ if __name__ == "__main__":
     
     active_subject_cmd = subprocess.check_output(f"rsync -az {complementary_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", shell=True, text=True)
     print(active_subject_cmd)
+<<<<<<< Updated upstream
 
+=======
+    
+>>>>>>> Stashed changes
     active_subject_cmd = subprocess.check_output(f"rsync -az {outside_cluster_login} {scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", shell=True, text=True)
     print(active_subject_cmd)
     
     with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{complementary_cluster_name}.json", "r") as json_file:
         active_subject = json.load(json_file)
     print(f"Number of active subjects on {complementary_cluster_name} cluster: ",len(active_subject))
+    
+    with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", "r") as json_file:
+        active_subject_outside = json.load(json_file)
+    print(f"Number of active subjects on {outside_cluster_name} cluster: ",len(active_subject_outside))
 
     with open(f"{scratch_path}/ukbb/scripts/data/active_subjects_{outside_cluster_name}.json", "r") as json_file:
         active_subject_outside = json.load(json_file)
